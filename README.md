@@ -1,8 +1,7 @@
 # Blog "Black Pearl"
-[![Build Status](https://travis-ci.com/THaGKI9/blog.svg?token=j8VM51DqUJnq7a67x9bo&branch=master)](https://travis-ci.com/THaGKI9/blog)
+![Build Status](https://travis-ci.com/THaGKI9/blog.svg?token=j8VM51DqUJnq7a67x9bo&branch=master)
 
-我的博客：[https://thagki9.com](https://thagki9.com)
+Access at [https://thagki9.com](https://thagki9.com)
 
-* 我的博客采用 [Hexo](https://hexo.io) + [NexT](http://theme-next.iissnan.com/) 主题
-* 部署在 Github Pages 上
-* 通过 Travis CI 完成自动部署
+* My blog page is based on [Hexo](https://hexo.io) + [Theme Icarus](https://github.com/ppoffice/hexo-theme-icarus)
+* Deploy on Github Pages with Travis CI
