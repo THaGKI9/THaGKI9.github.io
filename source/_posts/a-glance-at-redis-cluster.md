@@ -2,6 +2,7 @@
 title: 由 Eval 引申到 Redis Cluster 的学习
 toc: true
 date: 2019-04-18 00:21:51
+categories: 学习
 tags:
     - redis
     - study

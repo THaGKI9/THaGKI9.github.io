@@ -2,12 +2,13 @@
 title: SSL Handshake 被莫名其妙地 RST
 toc: true
 date: 2019-05-09 21:42:09
+categories: 踩坑记录
+thumbnail: /2019/05/09/wired-ssl-handshake-reset/wireshark-result-1.png
 tags:
     - 踩坑
     - Nginx
     - SSL
 ---
-
 最近我接的外包项目甲方又要开一个新的项目，于是丢过来几台阿里云的服务器，我来负责服务器基础架构的搭建，其实也就是网关，Runtime，Redis, Syslog 那些东西，已经做得滚瓜烂熟了。这次打算自己编译 OpenResty，调教出一个高性能网关，于是弄好了 OpenResty，也顺手把甲方发过来的 SSL 证书配置到了 OpenResty 上。
 
 配置 HTTPS 的过程跟以前一样，设置好 `ssl_certificate`, `ssl_certificate_key`,`listen 443 ssl http2` 这些东西，再附加一些 `ssl_cipher` 方面的参数，`openresty -s reload` 完事。

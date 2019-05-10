@@ -73,6 +73,8 @@ pagination_dir: page
 # Themes: https://hexo.io/themes/
 theme: icarus
 
+favicon: /favicon.ico
+
 # ========= Config for Icarus
 logo: /images/steering-wheel.svg
 navbar:
@@ -100,7 +102,7 @@ article:
   # https://github.com/highlightjs/highlight.js/tree/master/src/styles
   highlight: atom-one-light
   # Whether to show article thumbnail images
-  thumbnail: false
+  thumbnail: true
   # Whether to show estimate article reading time
   readtime: true
 
@@ -140,7 +142,7 @@ widgets:
     author: Tony Ke
     author_title: A Backend Engineer
     location: Mirage
-    avatar: ./images/avatar.jpg
+    avatar: /images/avatar.jpg
     gravatar:
     avatar_rounded: false
     # Path or URL for the follow button
