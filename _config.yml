@@ -70,13 +70,6 @@ time_format: HH:mm:ss
 per_page: 10
 pagination_dir: page
 
-# Extensions
-## Plugins: https://hexo.io/plugins/
-deploy:
-  type: git
-  repo: git@github.com:THaGKI9/THaGKI9.github.io.git
-  branch: master
-
 # Themes: https://hexo.io/themes/
 theme: icarus
 
@@ -90,11 +83,6 @@ navbar:
       Categories: /categories
       Tags: /tags
       About: /about
-  # Navigation bar links to be shown on the right
-  links:
-      Download on GitHub:
-          icon: fab fa-github
-          url: 'http://github.com/ppoffice/hexo-theme-icarus'
 
 # Footer section link settings
 footer:
