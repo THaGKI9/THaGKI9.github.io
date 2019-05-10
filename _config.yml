@@ -74,9 +74,9 @@ pagination_dir: page
 # Themes: https://hexo.io/themes/
 theme: icarus
 
-favicon: favicon.ico
-
 # ========= Config for Icarus
+favicon: favicon.ico
+favicon_dir: /images/favicons
 logo: /images/steering-wheel.svg
 navbar:
   # Navigation bar menu links
