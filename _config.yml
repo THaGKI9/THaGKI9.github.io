@@ -125,10 +125,15 @@ search:
 # Comment plugin settings
 # http://ppoffice.github.io/hexo-theme-icarus/categories/Configuration/Comment-Plugins
 comment:
-  # Name of the comment plugin
   # ---- disqus ----
-  type: disqus
-  shortname: black-pearl
+  # type: disqus
+  # shortname: black-pearl
+  type: gitalk
+  owner: thagki9
+  repo: THaGKI9.github.io
+  client_id: e18ca5e63b7fdac65342
+  client_secret: 9c968a4553b1f568aa8c7b36239b997ebc727bc0
+  admin: thagki9
 
 # Sidebar settings.
 # Please be noted that a sidebar is only visible when it has at least one widget
