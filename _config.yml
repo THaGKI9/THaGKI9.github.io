@@ -71,10 +71,19 @@ time_format: HH:mm:ss
 per_page: 10
 pagination_dir: page
 
+all_minifier: true
+
+image_minifier:
+  enable: false
+
+
 # Themes: https://hexo.io/themes/
 theme: icarus
 
-# ========= Config for Icarus
+
+# ====================================
+# ========= Config for Icarus ========
+# ====================================
 favicon: favicon.ico
 favicon_dir: /images/favicons
 logo: /images/steering-wheel.svg
