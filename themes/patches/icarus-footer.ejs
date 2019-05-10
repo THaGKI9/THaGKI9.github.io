@@ -3,7 +3,7 @@
         <div class="level">
             <div class="level-start has-text-centered-mobile">
                 <p class="is-size-7">
-                <span>Last updated at: <%- new Date().toISOString() -%></span>
+                <span>Last updated at: <%- moment().tz('Asia/Shanghai').format("YYYY-MM-DD HH:mm:ss ") -%> GMT+8 </span>
                 <br>
                 <span>&copy; <%= get_config('since'); %> - <%= date(new Date(), 'YYYY') %> <%= get_config('author') || get_config('title') %></span>
                 <% if (has_config('plugins.busuanzi') ? get_config('plugins.busuanzi') : false) { %>
