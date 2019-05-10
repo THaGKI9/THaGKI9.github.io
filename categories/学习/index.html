@@ -2,7 +2,7 @@
 <html lang="en">
 <head><meta name="generator" content="Hexo 3.8.0">
     <meta charset="utf-8">
-<title>Tag: SSL - Black Pearl</title>
+<title>Category: 学习 - Black Pearl</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
@@ -109,8 +109,9 @@
     <div class="card-content">
         <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
-            <li><a href="/tags">Tags</a></li>
-            <li class="is-active"><a href="#" aria-current="page">SSL</a></li>
+            <li><a href="/categories">Categories</a></li>
+            
+            <li class="is-active"><a href="#" aria-current="page">学习</a></li>
         </ul>
         </nav>
     </div>
@@ -118,27 +119,21 @@
 
     <div class="card">
     
-    <div class="card-image">
-        <a href="/2019/05/09/wired-ssl-handshake-reset/" class="image is-7by1">
-            <img class="thumbnail" src="/2019/05/09/wired-ssl-handshake-reset/wireshark-result-1.png" alt="SSL Handshake 被莫名其妙地 RST">
-        </a>
-    </div>
-    
     <div class="card-content article ">
         
         <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
             <div class="level-left">
-                <time class="level-item has-text-grey" datetime="2019-05-09T13:42:09.000Z">2019-05-09</time>
+                <time class="level-item has-text-grey" datetime="2019-04-17T16:21:51.000Z">2019-04-18</time>
                 
                 <div class="level-item">
-                <a class="has-link-grey -link" href="/categories/踩坑记录/">踩坑记录</a>
+                <a class="has-link-grey -link" href="/categories/学习/">学习</a>
                 </div>
                 
                 
                 <span class="level-item has-text-grey">
                     
                     
-                    12 minutes read (About 1822 words)
+                    12 minutes read (About 1872 words)
                 </span>
                 
                 
@@ -147,21 +142,77 @@
         
         <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
             
-                <a class="has-link-black-ter" href="/2019/05/09/wired-ssl-handshake-reset/">SSL Handshake 被莫名其妙地 RST</a>
+                <a class="has-link-black-ter" href="/2019/04/17/a-glance-at-redis-cluster/">由 Eval 引申到 Redis Cluster 的学习</a>
             
         </h1>
         <div class="content">
-            <p>最近我接的外包项目甲方又要开一个新的项目，于是丢过来几台阿里云的服务器，我来负责服务器基础架构的搭建，其实也就是网关，Runtime，Redis, Syslog 那些东西，已经做得滚瓜烂熟了。这次打算自己编译 OpenResty，调教出一个高性能网关，于是弄好了 OpenResty，也顺手把甲方发过来的 SSL 证书配置到了 OpenResty 上。</p>
-<p>配置 HTTPS 的过程跟以前一样，设置好 <code>ssl_certificate</code>, <code>ssl_certificate_key</code>,<code>listen 443 ssl http2</code> 这些东西，再附加一些 <code>ssl_cipher</code> 方面的参数，<code>openresty -s reload</code> 完事。</p>
-<p><code>reload</code> 完了之后我在我本地的 Chrome 上通过域名访问了 <code>https://xxx.com</code> (xxx.com) 为甲方域名，一开始几次访问是 <code>ERROR_CONNECTION_RESET</code>，我也不以为然，因为服务器上的 OpenResty 刚 Reload，以及我本机上常着的 Surge 代理有时候可能会断线，所以我以为这种情况比较常见，刷新几次就好了，见到了 <code>Welcome To OpenResty</code>。</p>
-<p>晚上回家之后团队的小伙伴告诉我他访问不了这个服务器的 https，我自己试了一下确实没法访问，一直提示 <code>ERROR_CONNECTION_RESET</code>，偶尔成功。这时候我才开始重视起来，准备研究一下这个问题。<br></p>
+            <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>因为业务需要写了一段 Redis 的 Lua Script，在调用 <code>EVAL</code> 的时候发现还有两个参数 <code>KEYS</code> 和 <code>ARGV</code>，感觉很疑惑，难道不是简单的传点参数进去就可以？所以了解了一下这两个参数的含义。</p>
+<p><a href="https://redis.io/commands/eval" target="_blank" rel="noopener">EVAL</a> 命令的定义是<br><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EVAL script numkeys key [key ...] arg [arg ...]</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>All Redis commands must be analyzed before execution to determine which keys the command will operate on. In order for this to be true for EVAL, keys must be passed explicitly. This is useful in many ways, but especially to make sure Redis Cluster can forward your request to the appropriate cluster node.</p>
+</blockquote>
+<p>Redis 设计的原意是使用者应当将在 Lua Script 中操作的所有 KEY 以 KEYS 的形式传给 EVAL，这样 EVAL 能够在真正运行前检查一下 KEY，就目前来说，是根据 KEYS 来决定把指令转发到哪台 Redis Cluster Master Node 上。<br>ARGV 则是传递一些必要的参数，这个倒是没什么使用规范。</p>
+<p>于是我先放下 EVAL，了解一下 Redis Cluster，用了这么久 Redis 了，还没用过 Redis Cluster，惭愧。<br></p>
         </div>
         
         
         <div class="level is-mobile">
             <div class="level-start">
                 <div class="level-item">
-                <a class="button is-size-7 is-light" href="/2019/05/09/wired-ssl-handshake-reset/#more">Read More</a>
+                <a class="button is-size-7 is-light" href="/2019/04/17/a-glance-at-redis-cluster/#more">Read More</a>
+                </div>
+            </div>
+        </div>
+        
+        
+    </div>
+</div>
+
+
+
+
+
+
+
+
+    <div class="card">
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2018-07-06T11:10:12.000Z">2018-07-06</time>
+                
+                <div class="level-item">
+                <a class="has-link-grey -link" href="/categories/学习/">学习</a>
+                </div>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    5 minutes read (About 732 words)
+                </span>
+                
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                <a class="has-link-black-ter" href="/2018/07/06/learn-k8s-1/">Kubernetes 学习札记 - 在 Google Cloud 上搭建集群</a>
+            
+        </h1>
+        <div class="content">
+            <h4 id="Target"><a href="#Target" class="headerlink" title="Target"></a>Target</h4><ul>
+<li>搭建 Kubernetes 集群（Master <em> 1 + Node </em> 2）</li></ul>
+        </div>
+        
+        
+        <div class="level is-mobile">
+            <div class="level-start">
+                <div class="level-item">
+                <a class="button is-size-7 is-light" href="/2018/07/06/learn-k8s-1/#more">Read More</a>
                 </div>
             </div>
         </div>
