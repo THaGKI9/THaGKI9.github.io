@@ -13,11 +13,9 @@
     <div class="card-content">
         <nav class="level">
             <div class="level-item has-text-centered">
-                <div>
+                <div class="image">
                     <% if (get_config_from_obj(widget, 'avatar_rounded')) { %>
-                        <figure class="image container is-128x128 has-mb-6">
-                            <img class="is-rounded" src="<%= avatar() %>" alt="<%= get_config_from_obj(widget, 'author') %>">
-                        </figure>
+                        <img class="image is-128x128 has-mb-6 is-rounded" src="<%= avatar() %>" alt="<%= get_config_from_obj(widget, 'author') %>">
                     <% } else { %>
                         <img class="image is-128x128 has-mb-6" src="<%= avatar() %>" alt="<%= get_config_from_obj(widget, 'author') %>">
                     <% } %>

@@ -1,6 +1,6 @@
 ---
 title: 持之以恒训练打卡记录
-date: 2019-01-16T17:00:00+0800
+date: 2019-01-16T17:00:00Z
 tags:
 categories: 生活
 toc: true

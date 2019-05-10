@@ -144,7 +144,7 @@ widgets:
     location: Mirage
     avatar: /images/avatar.jpg
     gravatar:
-    avatar_rounded: false
+    avatar_rounded: true
     # Path or URL for the follow button
     follow_link: http://github.com/thagki9
     # Links to be shown on the bottom of the profile widget
