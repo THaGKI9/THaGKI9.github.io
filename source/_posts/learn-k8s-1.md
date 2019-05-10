@@ -10,7 +10,7 @@ tags:
 
 #### Target
 
-* 搭建 Kubernetes 集群（Master * 1 + Node * 2）
+* 搭建 Kubernetes 集群（Master \* 1 + Node \* 2）
 <!-- more -->
 
 

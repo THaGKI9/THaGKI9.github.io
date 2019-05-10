@@ -9,6 +9,7 @@ description: This is my zone.
 author: Tony Ke
 language: en-US
 timezone: Asia/Shanghai
+since: 2017
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
@@ -73,7 +74,7 @@ pagination_dir: page
 # Themes: https://hexo.io/themes/
 theme: icarus
 
-favicon: /favicon.ico
+favicon: favicon.ico
 
 # ========= Config for Icarus
 logo: /images/steering-wheel.svg
