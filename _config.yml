@@ -193,9 +193,6 @@ plugins:
   mathjax: false
   # Show the back to top button on mobile devices
   back-to-top: true
-  # Google Analytics plugin settings
-  # http://ppoffice.github.io/hexo-theme-icarus/Plugins/General/site-analytics-plugin/#Google-Analytics
-  progressbar: true
   # Show the copy button in the highlighted code area
   clipboard: true
   # BuSuanZi site/page view counter
