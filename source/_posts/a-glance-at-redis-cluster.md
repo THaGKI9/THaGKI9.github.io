@@ -21,6 +21,7 @@ Redis 设计的原意是使用者应当将在 Lua Script 中操作的所有 KEY 
 ARGV 则是传递一些必要的参数，这个倒是没什么使用规范。
 
 于是我先放下 EVAL，了解一下 Redis Cluster，用了这么久 Redis 了，还没用过 Redis Cluster，惭愧。
+<!-- more -->
 
 ### Redis Cluster
 Redis Cluster 简单的来说就是若干 Redis 节点组成集群，数据根据 KEY 被分散到不同的节点上面，而不是节点之间互为 Replication。KEY 的分散策略不是 Consistent Hashing，而是一种叫做 **Slots** 的机制，在文章最后我再介绍一下我对 Slots 机制的理解。

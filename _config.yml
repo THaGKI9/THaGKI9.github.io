@@ -126,9 +126,9 @@ search:
 # http://ppoffice.github.io/hexo-theme-icarus/categories/Configuration/Comment-Plugins
 comment:
   # Name of the comment plugin
+  # ---- disqus ----
   type: disqus
   shortname: black-pearl
-
 
 # Sidebar settings.
 # Please be noted that a sidebar is only visible when it has at least one widget
@@ -145,7 +145,7 @@ widgets:
     type: profile
     position: right
     author: Tony Ke
-    author_title: Backend Engineer
+    author_title: A Backend Engineer
     location: Mirage
     avatar: ./images/avatar.jpg
     gravatar:

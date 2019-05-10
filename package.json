@@ -6,6 +6,7 @@
     "version": "3.8.0"
   },
   "scripts": {
+    "init": "git submodule update --init --recursive && echo \"version: 2.3.0\" >> ./themes/icarus/_config.yml",
     "hexo": "hexo",
     "debug": "hexo server --debug",
     "deploy": "hexo generate --deploy"

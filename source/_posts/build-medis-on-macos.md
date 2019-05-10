@@ -13,6 +13,7 @@ tags:
 [Medis](https://github.com/luin/medis) 是一款简洁易用、实用的 Redis 图形化客户端，作者将这款软件在 Github 上开源，所有开发者可以自由下载它的源代码。
 
 Medis 在 App Store 上提供了下载，价值 ¥30，算是一种形式上的捐赠吧，不愿意花钱的开发者也可以根据本文的指示来构建并打包 Medis，与从 App Store下载的版本并无区别。
+<!-- more -->
 
 ### 前提
 
