@@ -1,5 +1,5 @@
 # Blog "Black Pearl"
-![Build Status](https://travis-ci.com/THaGKI9/THaGKI9.github.io.svg?branch=source)
+[![Build Status](https://travis-ci.com/THaGKI9/THaGKI9.github.io.svg?branch=source)](https://travis-ci.com/THaGKI9/THaGKI9.github.io)
 
 Access at [https://thagki9.com](https://thagki9.com)
 
