@@ -1,6 +1,6 @@
 ---
 title: Kubernetes 学习札记 - 在 Google Cloud 上搭建集群
-date: 2018-07-06 19:10:12
+date: 2018-07-06T19:10:12+0800
 toc: true
 categories: 学习
 tags:

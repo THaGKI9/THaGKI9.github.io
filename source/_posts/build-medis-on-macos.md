@@ -3,7 +3,7 @@ title: 在 macOS 上构建、打包 Medis
 date: 2018-07-19T00:00:57+0800
 categories: 分享
 toc: true
-thumbnail: /2018/07/19/build-medis-on-macos/medis-gui-preview.png
+thumbnail: /2018/07/18/build-medis-on-macos/medis-gui-preview.png
 tags:
     - DIY
     - Medis
