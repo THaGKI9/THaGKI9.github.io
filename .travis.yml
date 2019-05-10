@@ -17,6 +17,4 @@ script:
   - chmod 600 ~/.ssh/id_rsa
   - eval $(ssh-agent) && ssh-add ~/.ssh/id_rsa
   - mv .travis/ssh_config ~/.ssh/config
-  - 'echo "version: 2.3.0" >> ./themes/icarus/_config.yml'
-  - npm run hexo generate
-  - npm run hexo deploy
+  - ./deploy.sh
