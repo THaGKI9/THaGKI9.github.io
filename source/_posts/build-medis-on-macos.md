@@ -1,7 +1,7 @@
 ---
 title: 在 macOS 上构建、打包 Medis
 date: 2018-07-18T15:00:00Z
-categories: ShareAnyThings
+categories: ShareAnything
 toc: true
 thumbnail: /2018/07/18/build-medis-on-macos/medis-gui-preview.png
 tags:

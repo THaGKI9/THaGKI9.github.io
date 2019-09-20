@@ -2,7 +2,7 @@
 title: 使用 GitHub Actions 完成自动化部署 Hexo 博客
 toc: true
 date: 2019-09-20T23:33:36+0800
-categories: ShareAnyThings
+categories: ShareAnything
 thumbnail: /2019/09/20/hexo-cicd-on-github-actions/preview.png
 tags:
     - GitHub Actions
