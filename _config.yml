@@ -88,7 +88,6 @@ favicon: favicon.ico
 favicon_dir: /images/favicons
 logo: /images/steering-wheel.svg
 navbar:
-  # Navigation bar menu links
   menu:
       Home: /
       Archives: /archives
@@ -102,6 +101,9 @@ footer:
       Creative Commons:
           icon: fab fa-creative-commons
           url: 'https://creativecommons.org/'
+      Attribution 4.0 International:
+          icon: fab fa-creative-commons-by
+          url: 'https://creativecommons.org/licenses/by/4.0/'
       Download on GitHub:
           icon: fab fa-github
           url: 'http://github.com/ppoffice/hexo-theme-icarus'
@@ -110,7 +112,10 @@ footer:
 article:
   # Code highlight theme
   # https://github.com/highlightjs/highlight.js/tree/master/src/styles
-  highlight: atom-one-light
+  highlight:
+    theme: atom-one-light
+    clipboard: true
+    fold: unfolded
   # Whether to show article thumbnail images
   thumbnail: true
   # Whether to show estimate article reading time
