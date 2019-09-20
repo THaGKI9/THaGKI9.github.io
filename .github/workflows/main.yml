@@ -1,0 +1,29 @@
+name: compile-hexo
+
+on:
+  push:
+    branches:
+      - source
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+        ref: refs/heads/source
+
+    - uses: actions/setup-node@v1
+      with:
+        node_version: '8.x'
+
+    - uses: webfactory/ssh-agent@v0.1.1
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - run: npm ci
+
+    - run: ./deploy.sh
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

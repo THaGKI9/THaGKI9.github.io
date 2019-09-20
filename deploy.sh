@@ -1,6 +1,6 @@
 #!/bin/sh
 rm -rf public
-git clone git@github.com:THaGKI9/THaGKI9.github.io.git public
+git clone "https://thagki9:${ACCESS_TOKEN}@github.com/THaGKI9/THaGKI9.github.io.git" public
 cd public
 git rm -rf *
 cd ..
