@@ -3,6 +3,7 @@ rm -rf public
 git clone -b master "https://thagki9:${GITHUB_TOKEN}@github.com/THaGKI9/THaGKI9.github.io.git" public
 cd public
 git rm -rf *
+echo "NO JEKYLL! I LOVE HEXO" > .nojekyll
 cd ..
 
 ./generate.sh
