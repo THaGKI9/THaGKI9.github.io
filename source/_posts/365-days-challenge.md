@@ -2,10 +2,12 @@
 title: 持之以恒训练打卡记录
 date: 2019-01-16T17:00:00Z
 tags:
-categories: 生活
+categories: LifeRecorder
 toc: true
 
 ---
+
+<h1><center><strong>失败了，坚持了3个月，败给懒惰</strong></center></h1>
 
 <del>每天坚持做 100 个俯卧撑</del>每天坚持一项室内体育运动，暂定持续一年。没有特殊的健身目的，只是为了寻找一件事情让自己每天都努力去完成，锻炼自律性。
 

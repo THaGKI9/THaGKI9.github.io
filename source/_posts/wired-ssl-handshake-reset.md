@@ -2,7 +2,7 @@
 title: SSL Handshake 被莫名其妙地 RST
 toc: true
 date: 2019-05-09T21:42:09Z
-categories: 踩坑记录
+categories: Debugging
 thumbnail: /2019/05/09/wired-ssl-handshake-reset/wireshark-result-1.png
 tags:
     - 踩坑
@@ -36,12 +36,12 @@ tags:
 
 3. 开了 `wireshark` 来抓包
 
-   ![Failed Request](./wireshark-result-1.png)
+   ![Failed Request](wired-ssl-handshake-reset/wireshark-result-1.png)
    可以发现这么一个过程：`TCP Handshake -> SSL Client Hello -> Reset(Server sent) `
 
    我有幸地抓到了部分没有被 Reset 的请求，
 
-   ![Successful Request](./wireshark-result-2.png)
+   ![Successful Request](wired-ssl-handshake-reset/wireshark-result-2.png)
 
    可以看出，成功的请求的 `Client Hello `与被 Reset 的 `Client Hello` 的大小都是 `583 Byte`，并且我详细的对比了两个 `Packet`，发现除了时间戳以及必要的随机数之外并没有不一样的地方。
 
