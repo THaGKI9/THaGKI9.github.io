@@ -1,4 +1,4 @@
-name: compile-hexo
+name: Compile and Deploy to GitHub Page
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
       with:
         node_version: '8.x'
 
-    - name: Setup git email and name
+    - name: Setup Git user info
       run: |
         git config --global user.email "thagki9@outlook.com"
         git config --global user.name "GitHub Actions"
