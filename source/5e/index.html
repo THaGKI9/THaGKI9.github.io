@@ -15,10 +15,18 @@
             <h3 class="display-5">估算你的 5E 天梯分数</h3>
             <hr class="my-4">
             <div class="form-group">
-                <label for="5e-profile-url">请输入要查询的玩家 5e 主页链接</label>
+                <label for="5e-profile-url">请输入要查询的玩家 5e 主页链接或者用户名</label>
                 <input type="text" class="form-control" id="5e-profile-url"
-                    placeholder="https://www.5ewin.com/data/player/ec2d3z">
-                <small class="form-text text-muted">范例：https://www.5ewin.com/data/player/ec2d3z</small>
+                    placeholder="ec2d3z">
+                <small class="form-text text-muted">
+                    范例：
+                    <ul>
+                        <li>ec2d3z</li>
+                        <li>https://www.5ewin.com/data/player/ec2d3z</li>
+                    </ul>
+                </small>
+                <label for="precision-input">误差（数值越大估算约慢）：<span id="precision">150</span></label>
+                <input id="precision-input" type="range" class="form-control-range" min="30" max="200" value="150">
             </div>
             <button class="btn btn-primary" type="button" id="estimate-button">
                 <span class="spinner-border spinner-border-sm" role="status" id="estimate-loading" hidden></span>
@@ -52,7 +60,6 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
-        var fiveEProfilePrefix = 'https://www.5ewin.com/data/player/';
         var apiEndPoint = 'https://5e-elo-estimator.azurewebsites.net/api/infer-elo?code=uBqXdMi6ney0iD3zLBepnfSsalnFH1/JXFTz7SFSAOfu8Ab9Vom3wg==';
         var profileUrlTextBox = $('#5e-profile-url');
         var button = $('#estimate-button');
@@ -62,10 +69,12 @@
         var userIdText = $('#user-id');
         var userEloText = $('#user-elo');
         var userAvatarImg = $('#user-avatar');
+        var precisonSlider = $('#precision-input');
 
         function startEstimatingStatus() {
             profileUrlTextBox.attr('disabled', true);
             button.attr('disabled', true);
+            precisonSlider.attr('disabled', true);
             buttonText.text('估算中...');
             spinner.removeAttr('hidden');
             resultPanel.attr('hidden', true);
@@ -76,19 +85,25 @@
             button.removeAttr('disabled');
             buttonText.text('估算');
             spinner.attr('hidden', true);
+            precisonSlider.removeAttr('disabled');
         }
 
-        $('#estimate-button').on('click', function () {
+        precisonSlider.on('change', function(e) {
+            $('#precision').text(e.target.value);
+        })
+
+        button.on('click', function () {
             startEstimatingStatus();
 
-            var profileUrl = $('#5e-profile-url').val();
-            if (!profileUrl.startsWith(fiveEProfilePrefix)) {
-                alert('请输入有效的 5E 主页链接!');
+            var profileUrl = ($('#5e-profile-url').val() || '').trim();
+            var precision = $('#precision-input').val();
+
+            if (profileUrl === '') {
                 endEstimatingStatus();
                 return;
             }
 
-            axios.get(apiEndPoint + `&id=${profileUrl}`)
+            axios.get(apiEndPoint + `&id=${profileUrl}&precision=${precision}`)
                 .then((function (resp) {
                     if (resp.status != 200) {
                         alert('服务器返回状态码：' + resp.status);
@@ -99,6 +114,7 @@
                         resultPanel.removeAttr('hidden');
                         userAvatarImg.attr('src', data.data.avatar);
                         userIdText.text(data.data.username);
+                        userIdText.attr('href', data.data.avatar);
 
                         if (data.data.elo != 0) {
                             userEloText.text(data.data.elo);
