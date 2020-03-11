@@ -20,8 +20,9 @@
 
     <div class="jumbotron jumbotron-fluid">
         <div class="container-fluid main">
-            <h3 class="display-5">估算你的 5E 天梯分数</h3>
-            <hr class="my-4">
+            <h2 class="display-5">估算你的 5E 天梯分数</h2>
+            <p class="lead">帮助未完成定级赛的玩家估算分数</p>
+            <hr class="my-3">
             <label for="5e-profile-url">请输入要查询的玩家 5e 主页链接</label>
             <input type="text" class="form-control" id="5e-profile-url" placeholder="ec2d3z">
             <small class="form-text text-muted">
@@ -32,10 +33,11 @@
                 </ul>
             </small>
 
-            <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-end justify-content-between">
                 <div style="flex-grow: 1;">
-                    <label for="precision-input">误差（数值越小估算越慢）：<span id="precision">150</span></label>
+                    <label for="precision-input">误差：<span id="precision">150</span></label>
                     <input id="precision-input" type="range" class="form-control-range" min="30" max="150" value="100">
+                    <small class="form-text text-muted">误差越小，计算越慢</small>
                 </div>
                 <button class="btn btn-primary" type="button" id="estimate-button"
                     style="width: 120px; margin-left: 15px;">
@@ -45,10 +47,10 @@
             </div>
 
 
-            <hr class="my-4" />
+            <hr class="my-3" />
             <div class="form-group">
-                <p class="text-center">最近查询</p>
-                <div id="result-box"></div>
+                <h4 class="display-5">最近查询</h4>
+                <div id="result-box" style="margin-top: 1rem;"></div>
             </div>
         </div>
     </div>
