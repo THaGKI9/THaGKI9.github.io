@@ -10,19 +10,26 @@
 </head>
 
 <body>
+    <style>
+        @media (min-width: 500px) {
+            .main {
+                max-width: 500px;
+            }
+        }
+    </style>
+
     <div class="jumbotron jumbotron-fluid">
-        <div class="container-fluid">
+        <div class="container-fluid main">
             <h3 class="display-5">估算你的 5E 天梯分数</h3>
             <hr class="my-4">
             <div class="form-group">
-                <label for="5e-profile-url">请输入要查询的玩家 5e 主页链接或者用户名</label>
-                <input type="text" class="form-control" id="5e-profile-url"
-                    placeholder="ec2d3z">
+                <label for="5e-profile-url">请输入要查询的玩家 5e 主页链接</label>
+                <input type="text" class="form-control" id="5e-profile-url" placeholder="ec2d3z">
                 <small class="form-text text-muted">
                     范例：
                     <ul>
-                        <li>ec2d3z</li>
                         <li>https://www.5ewin.com/data/player/ec2d3z</li>
+                        <li>ec2d3z</li>
                     </ul>
                 </small>
                 <label for="precision-input">误差（数值越大估算约慢）：<span id="precision">150</span></label>
@@ -33,17 +40,10 @@
                 <span id="estimate-button-text">估算</span>
             </button>
             <hr class="my-4 result" />
-            <div class="form-group result" hidden>
-                <p>查询结果</p>
-                <div class="d-flex align-items-center justify-content-between">
-                    <img id="user-avatar" width="80px" height="80px" src="https://oss.5ewin.com/avatar/default_1.png"
-                        alt="">
-                    <div class="text-right">
-                        <a class="font-weight-bold" id="user-id" href="#">username</a>
-                        <p id="user-elo">elo</p>
-                    </div>
+            <div class="form-group">
+                <p class="text-center">最近查询</p>
+                <div id="result-box">
                 </div>
-
             </div>
         </div>
     </div>
@@ -65,19 +65,19 @@
         var button = $('#estimate-button');
         var buttonText = $('#estimate-button-text');
         var spinner = $('#estimate-loading');
-        var resultPanel = $('.result');
         var userIdText = $('#user-id');
         var userEloText = $('#user-elo');
         var userAvatarImg = $('#user-avatar');
-        var precisonSlider = $('#precision-input');
+        var precisionSlider = $('#precision-input');
+        var resultBox = $('#result-box');
+        var precisionLabel = $('#precision');
 
         function startEstimatingStatus() {
             profileUrlTextBox.attr('disabled', true);
             button.attr('disabled', true);
-            precisonSlider.attr('disabled', true);
+            precisionSlider.attr('disabled', true);
             buttonText.text('估算中...');
             spinner.removeAttr('hidden');
-            resultPanel.attr('hidden', true);
         }
 
         function endEstimatingStatus() {
@@ -85,25 +85,32 @@
             button.removeAttr('disabled');
             buttonText.text('估算');
             spinner.attr('hidden', true);
-            precisonSlider.removeAttr('disabled');
+            precisionSlider.removeAttr('disabled');
         }
 
-        precisonSlider.on('change', function(e) {
-            $('#precision').text(e.target.value);
+        precisionSlider.on('change', function (e) {
+            precisionLabel.text(e.target.value);
         })
 
-        button.on('click', function () {
+        button.on('click', function () { estimate(); });
+
+        function estimate(userId) {
             startEstimatingStatus();
 
-            var profileUrl = ($('#5e-profile-url').val() || '').trim();
-            var precision = $('#precision-input').val();
-
-            if (profileUrl === '') {
-                endEstimatingStatus();
-                return;
+            if (!userId) {
+                var profileUrl = (profileUrlTextBox.val() || '').trim();
+                if (profileUrl === '') {
+                    endEstimatingStatus();
+                    return new Promise(function (res) { res(); });
+                }
+                userId = profileUrl;
             }
+            userId = userId.toLowerCase();
 
-            axios.get(apiEndPoint + `&id=${profileUrl}&precision=${precision}`)
+            precision = precisionSlider.val();
+            updateLastPrecision(precision);
+
+            return axios.get(apiEndPoint + `&id=${userId}&precision=${precision}`)
                 .then((function (resp) {
                     if (resp.status != 200) {
                         alert('服务器返回状态码：' + resp.status);
@@ -111,24 +118,141 @@
                     }
                     var data = resp.data;
                     if (data.success) {
-                        resultPanel.removeAttr('hidden');
-                        userAvatarImg.attr('src', data.data.avatar);
-                        userIdText.text(data.data.username);
-                        userIdText.attr('href', data.data.avatar);
+                        var player = data.data;
+                        updateHistory(player);
 
-                        if (data.data.elo != 0) {
-                            userEloText.text(data.data.elo);
+                        var tag = '#player-' + player.user_id;
+                        if (!$(tag).length) {
+                            renderProfile(player);
                         } else {
-                            userEloText.text(`${data.data.lower_limit}~${data.data.upper_limit}`);
+                            var element = $(`#player-${player.user_id}`).remove()
+                            var firstPlayerElement = resultBox.children().first();
+                            if (!firstPlayerElement) {
+                                element.appendTo(resultBox);
+                            } else {
+                                element.insertBefore(firstPlayerElement);
+                            }
+
+                            $(`#player-${player.user_id}-avatar`).attr('src', player.avatar);
+                            $(`#player-${player.user_id}-id`).attr('href', `https://www.5ewin.com/data/player/${player.user_id}`);
+                            $(`#player-${player.user_id}-id`).text(player.username);
+                            $(`#player-${player.user_id}-elo`).text(player.elo != 0 ? player.elo : `${player.lower_limit}~${player.upper_limit}`);
                         }
+                        profileUrlTextBox.val('');
                     } else {
                         alert('查询失败，原因：' + data.message);
                     }
                 }))
-                .finally(function () {
-                    endEstimatingStatus();
-                });
-        });
+                .finally(endEstimatingStatus);
+        }
+
+        function reEstimate(userId) {
+            var player = getHistoryProfile(userId);
+            if (player == null) {
+                return;
+            }
+
+            $(`.re-estimate-button`).attr('disabled', true);
+            $(`#player-${player.user_id}-estimate-button-text`).text('重新估算中...');
+            $(`#player-${player.user_id}-estimate-loading`).removeAttr('hidden');
+
+            estimate(userId).finally(function () {
+                $(`.re-estimate-button`).attr('disabled', false);
+                $(`#player-${player.user_id}-estimate-button-text`).text('重新估算');
+                $(`#player-${player.user_id}-estimate-loading`).attr('hidden', true);
+            })
+        }
+
+        var storageKeyPlayerList = 'player-list';
+        var storageKeyPlayerProfile = 'player:'
+        var storageKeyPrecision = 'precision'
+
+        function init(playerProfile) {
+            var precision = getLastPrecision();
+            if (precision > 0) {
+                precisionSlider.val(precision);
+                precisionLabel.text(precision);
+            }
+
+            var list = getHistoryPlayerList();
+            list.forEach(function (p) {
+                var player = getHistoryProfile(p);
+                if (!player) {
+                    return;
+                }
+                resultBox.append(renderProfile(player));
+            });
+        };
+        init();
+
+        function updateLastPrecision(precision) {
+            window.localStorage.setItem(storageKeyPrecision, precision);
+        }
+
+        function getLastPrecision() {
+            return parseInt(window.localStorage.getItem(storageKeyPrecision) || '0');
+        }
+
+        function renderProfile(player) {
+            resultBox.html(''
+                + `<div id="player-${player.user_id}" class="d-flex align-items-center justify-content-between">`
+                + `    <div class="d-flex align-items-center">`
+                + `        <img id="player-${player.user_id}-avatar" class="rounded" width="55px" height="55px" src="${player.avatar}">`
+                + `        <div class="d-flex flex-column align-content-between" style="margin-left: 10px">`
+                + `            <a class="font-weight-bold mr-auto" id="player-${player.user_id}-id" href="https://www.5ewin.com/data/player/${player.user_id}" target="_blank">${player.username}</a>`
+                + `            <p id="player-${player.user_id}-elo">${player.elo != 0 ? player.elo : `${player.lower_limit}~${player.upper_limit}`}</p>`
+                + `        </div>`
+                + `    </div>`
+                + `    <button class="btn btn-primary re-estimate-button" type="button" id="player-${player.user_id}-estimate-button" onclick="javascript:reEstimate('${player.user_id}')">`
+                + `        <span class="spinner-border spinner-border-sm" role="status" id="player-${player.user_id}-estimate-loading" hidden></span>`
+                + `        <span id="player-${player.user_id}-estimate-button-text">重新估算</span>`
+                + `    </button>`
+                + `</div>` + resultBox.html());
+        }
+
+        function getHistoryProfile(userId) {
+            var content = (window.localStorage.getItem(storageKeyPlayerProfile + userId) || '').trim();
+            if (content !== '') {
+                try {
+                    return JSON.parse(content);
+                }
+                catch {
+                    removeHistory(userId);
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        function removeHistory(userId) {
+            var players = getHistoryPlayerList();
+            var index = players.indexOf(playerProfile.user_id);
+            if (index != -1) {
+                players.splice(index, 1);
+            }
+            window.localStorage.setItem(storageKeyPlayerList, players.join(','));
+            window.localStorage.removeItem(storageKeyPlayerProfile + userId);
+        }
+
+        function updateHistory(playerProfile) {
+            var players = getHistoryPlayerList();
+            var index = players.indexOf(playerProfile.user_id);
+            if (index != -1) {
+                players.splice(index, 1);
+            }
+            players.push(playerProfile.user_id);
+            window.localStorage.setItem(storageKeyPlayerList, players.join(','));
+            window.localStorage.setItem(storageKeyPlayerProfile + playerProfile.user_id, JSON.stringify(playerProfile));
+        }
+
+        function getHistoryPlayerList() {
+            var list = (window.localStorage.getItem(storageKeyPlayerList) || '').trim();
+            if (list === '') {
+                return [];
+            }
+            return list.split(',');
+        }
+
     </script>
 </body>
 
