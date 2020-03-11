@@ -110,7 +110,7 @@
             precision = precisionSlider.val();
             updateLastPrecision(precision);
 
-            return axios.get(apiEndPoint + `&id=${userId}&precision=${precision}`)
+            return axios.get(apiEndPoint + `&id=${userId}&precision=${precision}&t=${+new Date()}`)
                 .then((function (resp) {
                     if (resp.status != 200) {
                         alert('服务器返回状态码：' + resp.status);
