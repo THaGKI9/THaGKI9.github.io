@@ -22,28 +22,33 @@
         <div class="container-fluid main">
             <h3 class="display-5">估算你的 5E 天梯分数</h3>
             <hr class="my-4">
-            <div class="form-group">
-                <label for="5e-profile-url">请输入要查询的玩家 5e 主页链接</label>
-                <input type="text" class="form-control" id="5e-profile-url" placeholder="ec2d3z">
-                <small class="form-text text-muted">
-                    范例：
-                    <ul>
-                        <li>https://www.5ewin.com/data/player/ec2d3z</li>
-                        <li>ec2d3z</li>
-                    </ul>
-                </small>
-                <label for="precision-input">误差（数值越大估算越慢）：<span id="precision">150</span></label>
-                <input id="precision-input" type="range" class="form-control-range" min="30" max="200" value="150">
+            <label for="5e-profile-url">请输入要查询的玩家 5e 主页链接</label>
+            <input type="text" class="form-control" id="5e-profile-url" placeholder="ec2d3z">
+            <small class="form-text text-muted">
+                范例：
+                <ul>
+                    <li>https://www.5ewin.com/data/player/ec2d3z</li>
+                    <li>ec2d3z</li>
+                </ul>
+            </small>
+
+            <div class="d-flex align-items-center justify-content-between">
+                <div style="flex-grow: 1;">
+                    <label for="precision-input">误差（数值越小估算越慢）：<span id="precision">150</span></label>
+                    <input id="precision-input" type="range" class="form-control-range" min="30" max="150" value="100">
+                </div>
+                <button class="btn btn-primary" type="button" id="estimate-button"
+                    style="width: 120px; margin-left: 15px;">
+                    <span class="spinner-border spinner-border-sm" role="status" id="estimate-loading" hidden></span>
+                    <span id="estimate-button-text">估算</span>
+                </button>
             </div>
-            <button class="btn btn-primary" type="button" id="estimate-button">
-                <span class="spinner-border spinner-border-sm" role="status" id="estimate-loading" hidden></span>
-                <span id="estimate-button-text">估算</span>
-            </button>
-            <hr class="my-4 result" />
+
+
+            <hr class="my-4" />
             <div class="form-group">
                 <p class="text-center">最近查询</p>
-                <div id="result-box">
-                </div>
+                <div id="result-box"></div>
             </div>
         </div>
     </div>
@@ -75,6 +80,7 @@
         function startEstimatingStatus() {
             profileUrlTextBox.attr('disabled', true);
             button.attr('disabled', true);
+            $(`.re-estimate-button`).attr('disabled', true);
             precisionSlider.attr('disabled', true);
             buttonText.text('估算中...');
             spinner.removeAttr('hidden');
@@ -83,6 +89,7 @@
         function endEstimatingStatus() {
             profileUrlTextBox.removeAttr('disabled');
             button.removeAttr('disabled');
+            $(`.re-estimate-button`).attr('disabled', false);
             buttonText.text('估算');
             spinner.attr('hidden', true);
             precisionSlider.removeAttr('disabled');
@@ -136,7 +143,7 @@
                             $(`#player-${player.user_id}-avatar`).attr('src', player.avatar);
                             $(`#player-${player.user_id}-id`).attr('href', `https://www.5ewin.com/data/player/${player.user_id}`);
                             $(`#player-${player.user_id}-id`).text(player.username);
-                            $(`#player-${player.user_id}-elo`).text(player.elo != 0 ? player.elo : `${player.lower_limit}~${player.upper_limit}`);
+                            $(`#player-${player.user_id}-elo`).text(formatElo(player));
                         }
                         profileUrlTextBox.val('');
                     } else {
@@ -152,7 +159,6 @@
                 return;
             }
 
-            $(`.re-estimate-button`).attr('disabled', true);
             $(`#player-${player.user_id}-estimate-button-text`).text('重新估算中...');
             $(`#player-${player.user_id}-estimate-loading`).removeAttr('hidden');
 
@@ -185,6 +191,18 @@
         };
         init();
 
+        function formatElo(player) {
+            if (player.elo != 0) {
+                return player.elo;
+            } else if (player.lower_limit === 0) {
+                return `< ${player.upper_limit}`;
+            } else if (player.upper_limit === 2147483647) {
+                return `> ${player.lower_limit}`;
+            } else {
+                return `${player.lower_limit} ~ ${player.upper_limit}`;
+            }
+        }
+
         function updateLastPrecision(precision) {
             window.localStorage.setItem(storageKeyPrecision, precision);
         }
@@ -195,12 +213,12 @@
 
         function renderProfile(player) {
             resultBox.html(''
-                + `<div id="player-${player.user_id}" class="d-flex align-items-center justify-content-between">`
+                + `<div id="player-${player.user_id}" class="d-flex align-items-center justify-content-between" style="margin: 8px 0;">`
                 + `    <div class="d-flex align-items-center">`
                 + `        <img id="player-${player.user_id}-avatar" class="rounded" width="55px" height="55px" src="${player.avatar}">`
-                + `        <div class="d-flex flex-column align-content-between" style="margin-left: 10px">`
+                + `        <div class="d-flex flex-column justify-content-center" style="margin-left: 10px">`
                 + `            <a class="font-weight-bold mr-auto" id="player-${player.user_id}-id" href="https://www.5ewin.com/data/player/${player.user_id}" target="_blank">${player.username}</a>`
-                + `            <p id="player-${player.user_id}-elo">${player.elo != 0 ? player.elo : `${player.lower_limit}~${player.upper_limit}`}</p>`
+                + `            <span id="player-${player.user_id}-elo">${formatElo(player)}</span>`
                 + `        </div>`
                 + `    </div>`
                 + `    <button class="btn btn-primary re-estimate-button" type="button" id="player-${player.user_id}-estimate-button" onclick="javascript:reEstimate('${player.user_id}')">`
