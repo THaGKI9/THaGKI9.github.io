@@ -107,7 +107,10 @@
             precisionLabel.text(e.target.value);
         })
 
-        button.on('click', function () { estimate(); });
+        button.on('click', function () {
+            estimate();
+            return false;
+        });
 
         function updateStat() {
             return axios.get(apiStat + `&t=${+new Date()}`)
@@ -152,7 +155,6 @@
                         if (!$(tag).length) {
                             renderProfile(player);
                         } else {
-
                             var element = $(tag).remove()
                             if (resultBox.children().length == 0) {
                                 element.appendTo(resultBox);
@@ -166,6 +168,7 @@
                             $(`#player-${santizedId}-elo`).text(formatElo(player));
                         }
                         profileUrlTextBox.val('');
+                        updateStat();
                     } else {
                         alert('查询失败，原因：' + data.message);
                     }
