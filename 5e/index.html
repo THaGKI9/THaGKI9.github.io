@@ -21,7 +21,7 @@
     <div class="jumbotron jumbotron-fluid">
         <form class="container-fluid main">
             <h2 class="display-5">估算你的 5E 天梯分数</h2>
-            <p class="lead">帮助未完成定级赛的玩家估算分数</p>
+            <p class="lead" id="stat-text">帮助未完成定级赛的玩家估算分数</p>
             <hr class="my-3">
             <label for="5e-profile-url">请输入要查询的玩家 5e 主页链接或者 ID</label>
             <input type="text" class="form-control" id="5e-profile-url" placeholder="ec2d3z">
@@ -42,9 +42,9 @@
                         <option selected>100</option>
                     </select>
                 </div>
-                <button class="btn btn-primary" type="submit" id="estimate-button"
+                <button class="btn btn-primary estimate-button" type="submit" id="estimate-button"
                     style="width: 120px; margin-left: 15px;">
-                    <span class="spinner-border spinner-border-sm" role="status" id="estimate-loading" hidden></span>
+                    <span class="spinner-border spinner-border-sm estimate-loading" role="status" hidden></span>
                     <span id="estimate-button-text">估算</span>
                 </button>
             </div>
@@ -52,10 +52,11 @@
 
             <hr class="my-3" />
             <div class="form-group">
-                <h4 class="display-5">最近查询   <a style="font-size: 60%" href="#" onclick="javascript: resetHistory()">重置</a></h4>
+                <h4 class="display-5">最近查询 <a style="font-size: 60%" href="#"
+                        onclick="javascript: resetHistory()">重置</a></h4>
                 <div id="result-box" style="margin-top: 1rem;"></div>
             </div>
-        </div>
+    </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
@@ -67,40 +68,38 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
+    <script src="./js-xss.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
-        var apiEndPoint = 'https://5e-elo-estimator.azurewebsites.net/api/infer-elo?code=8c6DNkSiMnfJ1O7WVYX6IFctPKEYTebVSLukKsgkSwmlTQS7palhFg==';
+        var apiInferElo = 'https://5e-elo-estimator.azurewebsites.net/api/infer-elo?code=8c6DNkSiMnfJ1O7WVYX6IFctPKEYTebVSLukKsgkSwmlTQS7palhFg==';
+        var apiStat = 'https://5e-elo-estimator.azurewebsites.net/api/stat?code=8c6DNkSiMnfJ1O7WVYX6IFctPKEYTebVSLukKsgkSwmlTQS7palhFg==';
+
         var profileUrlTextBox = $('#5e-profile-url');
         var button = $('#estimate-button');
         var buttonText = $('#estimate-button-text');
         var spinner = $('#estimate-loading');
-        var userIdText = $('#user-id');
-        var userEloText = $('#user-elo');
-        var userAvatarImg = $('#user-avatar');
         var precisionSelector = $('#precision-input');
         var resultBox = $('#result-box');
         var precisionLabel = $('#precision');
-        
+
         var storageKeyPlayerList = 'player-list';
         var storageKeyPlayerProfile = 'player:';
         var storageKeyPrecision = 'precision';
 
         function startEstimatingStatus() {
             profileUrlTextBox.attr('disabled', true);
-            button.attr('disabled', true);
-            $(`.re-estimate-button`).attr('disabled', true);
+            $(`.estimate-button`).attr('disabled', true);
             precisionSelector.attr('disabled', true);
             buttonText.text('估算中...');
-            spinner.removeAttr('hidden');
+            $(`.estimate-loading`).removeAttr('hidden');
         }
 
         function endEstimatingStatus() {
             profileUrlTextBox.removeAttr('disabled');
-            button.removeAttr('disabled');
-            $(`.re-estimate-button`).attr('disabled', false);
+            $(`.estimate-button`).attr('disabled', false);
             buttonText.text('估算');
-            spinner.attr('hidden', true);
+            $(`.estimate-loading`).attr('hidden', true);
             precisionSelector.removeAttr('disabled');
         }
 
@@ -109,6 +108,17 @@
         })
 
         button.on('click', function () { estimate(); });
+
+        function updateStat() {
+            return axios.get(apiStat + `&t=${+new Date()}`)
+                .then((function (resp) {
+                    var data = resp.data;
+                    if (data.success) {
+                        $('#stat-text').text(`今日已帮助 ${data.data.today_unique_user} 名未定级玩家完成 ${data.data.today_usage} 次分数估算`)
+                    }
+                }))
+                .catch(function () { });
+        }
 
         function estimate(userId) {
             startEstimatingStatus();
@@ -126,7 +136,7 @@
             precision = precisionSelector.val();
             updateLastPrecision(precision);
 
-            return axios.get(apiEndPoint + `&id=${userId}&precision=${precision}&t=${+new Date()}`)
+            return axios.get(apiInferElo + `&id=${userId}&precision=${precision}&t=${+new Date()}`)
                 .then((function (resp) {
                     if (resp.status != 200) {
                         alert('服务器返回状态码：' + resp.status);
@@ -137,22 +147,23 @@
                         var player = data.data;
                         updateHistory(player);
 
-                        var tag = '#player-' + player.user_id;
+                        var santizedId = filterXSS(player.user_id);
+                        var tag = '#player-' + santizedId;
                         if (!$(tag).length) {
                             renderProfile(player);
                         } else {
-                            var element = $(`#player-${player.user_id}`).remove()
-                            var firstPlayerElement = resultBox.children().first();
-                            if (!firstPlayerElement) {
+
+                            var element = $(tag).remove()
+                            if (resultBox.children().length == 0) {
                                 element.appendTo(resultBox);
                             } else {
-                                element.insertBefore(firstPlayerElement);
+                                element.insertBefore(resultBox.children().first());
                             }
 
-                            $(`#player-${player.user_id}-avatar`).attr('src', player.avatar);
-                            $(`#player-${player.user_id}-id`).attr('href', `https://www.5ewin.com/data/player/${player.user_id}`);
-                            $(`#player-${player.user_id}-id`).text(player.username);
-                            $(`#player-${player.user_id}-elo`).text(formatElo(player));
+                            $(`#player-${santizedId}-avatar`).attr('src', player.avatar);
+                            $(`#player-${santizedId}-id`).attr('href', `https://www.5ewin.com/data/player/${player.user_id}`);
+                            $(`#player-${santizedId}-id`).text(player.username);
+                            $(`#player-${santizedId}-elo`).text(formatElo(player));
                         }
                         profileUrlTextBox.val('');
                     } else {
@@ -168,18 +179,19 @@
                 return;
             }
 
-            $(`#player-${player.user_id}-estimate-button-text`).text('重新估算中...');
-            $(`#player-${player.user_id}-estimate-loading`).removeAttr('hidden');
+            var santizedId = filterXSS(player.user_id);
+
+            $(`#player-${santizedId}-estimate-button-text`).text('重新估算中...');
 
             estimate(userId).finally(function () {
-                $(`.re-estimate-button`).attr('disabled', false);
-                $(`#player-${player.user_id}-estimate-button-text`).text('重新估算');
-                $(`#player-${player.user_id}-estimate-loading`).attr('hidden', true);
+                $(`#player-${santizedId}-estimate-button-text`).text('重新估算');
             })
         }
 
 
         function init(playerProfile) {
+            updateStat();
+
             var precision = getLastPrecision();
             if (precision > 0) {
                 precisionSelector.val(precision);
@@ -223,18 +235,19 @@
         }
 
         function renderProfile(player) {
+            var santizedId = player.user_id;
             resultBox.html(''
-                + `<div id="player-${player.user_id}" class="d-flex align-items-center justify-content-between" style="margin: 8px 0;">`
+                + `<div id="player-${santizedId}" class="d-flex align-items-center justify-content-between" style="margin: 8px 0;">`
                 + `    <div class="d-flex align-items-center">`
-                + `        <img id="player-${player.user_id}-avatar" class="rounded" width="55px" height="55px" src="${player.avatar}">`
+                + `        <img id="player-${santizedId}-avatar" class="rounded" width="55px" height="55px" src="${player.avatar}">`
                 + `        <div class="d-flex flex-column justify-content-center" style="margin-left: 10px">`
-                + `            <a class="font-weight-bold mr-auto" id="player-${player.user_id}-id" href="https://www.5ewin.com/data/player/${player.user_id}" target="_blank">${player.username}</a>`
-                + `            <span id="player-${player.user_id}-elo">${formatElo(player)}</span>`
+                + `            <a class="font-weight-bold mr-auto" id="player-${santizedId}-id" href="https://www.5ewin.com/data/player/${player.user_id}" target="_blank">${filterXSS(player.username)}</a>`
+                + `            <span id="player-${santizedId}-elo">${formatElo(player)}</span>`
                 + `        </div>`
                 + `    </div>`
-                + `    <button class="btn btn-primary re-estimate-button" type="button" id="player-${player.user_id}-estimate-button" onclick="javascript:reEstimate('${player.user_id}')">`
-                + `        <span class="spinner-border spinner-border-sm" role="status" id="player-${player.user_id}-estimate-loading" hidden></span>`
-                + `        <span id="player-${player.user_id}-estimate-button-text">重新估算</span>`
+                + `    <button class="btn btn-primary estimate-button" type="button" id="player-${santizedId}-estimate-button" onclick="javascript:reEstimate('${player.user_id}')">`
+                + `        <span class="spinner-border spinner-border-sm estimate-loading" role="status" hidden></span>`
+                + `        <span id="player-${santizedId}-estimate-button-text">重新估算</span>`
                 + `    </button>`
                 + `</div>` + resultBox.html());
         }
