@@ -19,27 +19,30 @@
     </style>
 
     <div class="jumbotron jumbotron-fluid">
-        <div class="container-fluid main">
+        <form class="container-fluid main">
             <h2 class="display-5">估算你的 5E 天梯分数</h2>
             <p class="lead">帮助未完成定级赛的玩家估算分数</p>
             <hr class="my-3">
-            <label for="5e-profile-url">请输入要查询的玩家 5e 主页链接</label>
+            <label for="5e-profile-url">请输入要查询的玩家 5e 主页链接或者 ID</label>
             <input type="text" class="form-control" id="5e-profile-url" placeholder="ec2d3z">
             <small class="form-text text-muted">
                 范例：
                 <ul>
-                    <li>https://www.5ewin.com/data/player/ec2d3z</li>
                     <li>ec2d3z</li>
+                    <li>https://www.5ewin.com/data/player/ec2d3z</li>
                 </ul>
             </small>
 
             <div class="d-flex align-items-end justify-content-between">
                 <div style="flex-grow: 1;">
-                    <label for="precision-input">误差：<span id="precision">150</span></label>
-                    <input id="precision-input" type="range" class="form-control-range" min="30" max="150" value="100">
-                    <small class="form-text text-muted">误差越小，计算越慢</small>
+                    <label for="precision-input">误差（误差越小，计算越慢）</label>
+                    <select class="form-control" id="precision-input">
+                        <option>30</option>
+                        <option>50</option>
+                        <option selected>100</option>
+                    </select>
                 </div>
-                <button class="btn btn-primary" type="button" id="estimate-button"
+                <button class="btn btn-primary" type="submit" id="estimate-button"
                     style="width: 120px; margin-left: 15px;">
                     <span class="spinner-border spinner-border-sm" role="status" id="estimate-loading" hidden></span>
                     <span id="estimate-button-text">估算</span>
@@ -49,7 +52,7 @@
 
             <hr class="my-3" />
             <div class="form-group">
-                <h4 class="display-5">最近查询</h4>
+                <h4 class="display-5">最近查询   <a style="font-size: 60%" href="#" onclick="javascript: resetHistory()">重置</a></h4>
                 <div id="result-box" style="margin-top: 1rem;"></div>
             </div>
         </div>
@@ -75,15 +78,19 @@
         var userIdText = $('#user-id');
         var userEloText = $('#user-elo');
         var userAvatarImg = $('#user-avatar');
-        var precisionSlider = $('#precision-input');
+        var precisionSelector = $('#precision-input');
         var resultBox = $('#result-box');
         var precisionLabel = $('#precision');
+        
+        var storageKeyPlayerList = 'player-list';
+        var storageKeyPlayerProfile = 'player:';
+        var storageKeyPrecision = 'precision';
 
         function startEstimatingStatus() {
             profileUrlTextBox.attr('disabled', true);
             button.attr('disabled', true);
             $(`.re-estimate-button`).attr('disabled', true);
-            precisionSlider.attr('disabled', true);
+            precisionSelector.attr('disabled', true);
             buttonText.text('估算中...');
             spinner.removeAttr('hidden');
         }
@@ -94,10 +101,10 @@
             $(`.re-estimate-button`).attr('disabled', false);
             buttonText.text('估算');
             spinner.attr('hidden', true);
-            precisionSlider.removeAttr('disabled');
+            precisionSelector.removeAttr('disabled');
         }
 
-        precisionSlider.on('change', function (e) {
+        precisionSelector.on('change', function (e) {
             precisionLabel.text(e.target.value);
         })
 
@@ -116,7 +123,7 @@
             }
             userId = userId.toLowerCase();
 
-            precision = precisionSlider.val();
+            precision = precisionSelector.val();
             updateLastPrecision(precision);
 
             return axios.get(apiEndPoint + `&id=${userId}&precision=${precision}&t=${+new Date()}`)
@@ -171,14 +178,11 @@
             })
         }
 
-        var storageKeyPlayerList = 'player-list';
-        var storageKeyPlayerProfile = 'player:'
-        var storageKeyPrecision = 'precision'
 
         function init(playerProfile) {
             var precision = getLastPrecision();
             if (precision > 0) {
-                precisionSlider.val(precision);
+                precisionSelector.val(precision);
                 precisionLabel.text(precision);
             }
 
@@ -203,6 +207,11 @@
             } else {
                 return `${player.lower_limit} ~ ${player.upper_limit}`;
             }
+        }
+
+        function resetHistory() {
+            window.localStorage.clear();
+            location.reload();
         }
 
         function updateLastPrecision(precision) {
