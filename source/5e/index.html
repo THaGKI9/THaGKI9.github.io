@@ -24,7 +24,6 @@
             <p class="lead" id="stat-text">帮助未完成定级赛的玩家估算分数</p>
             <hr class="my-3">
             <label for="5e-profile-url">请输入要查询的玩家 5e 主页链接或者 ID</label>
-            <input type="text" class="form-control" id="5e-profile-url" placeholder="thagki9">
             <small class="form-text text-muted">
                 范例：
                 <ul>
@@ -32,23 +31,14 @@
                     <li>https://www.5ewin.com/data/player/thagki9</li>
                 </ul>
             </small>
-
-            <div class="d-flex align-items-end justify-content-between">
-                <div style="flex-grow: 1;">
-                    <label for="precision-input">误差</label>
-                    <select class="form-control" id="precision-input">
-                        <option>30</option>
-                        <option>50</option>
-                        <option selected>100</option>
-                    </select>
-                </div>
-                <button class="btn btn-primary estimate-button" type="submit" id="estimate-button"
-                    style="width: 120px; margin-left: 15px;">
-                    <span class="spinner-border spinner-border-sm estimate-loading" role="status" hidden></span>
-                    <span id="estimate-button-text">估算</span>
+            <div class="d-flex align-items-center justify-content-between">
+                <input type="text" class="form-control" id="5e-profile-url" placeholder="thagki9">
+                <button class="btn btn-primary estimate-button flex-grow" type="submit" id="estimate-button"
+                    style="margin-left: 10px; width: 120px;">
+                    <span id="estimate-loading" class="spinner-border spinner-border-sm" role="status" hidden></span>
+                    <span>估算</span>
                 </button>
             </div>
-
 
             <hr class="my-3" />
             <div class="form-group">
@@ -74,41 +64,32 @@
     <script>
         var apiInferElo = 'https://5e-elo-estimator.azurewebsites.net/api/infer-elo?code=8c6DNkSiMnfJ1O7WVYX6IFctPKEYTebVSLukKsgkSwmlTQS7palhFg==';
         var apiStat = 'https://5e-elo-estimator.azurewebsites.net/api/stat?code=8c6DNkSiMnfJ1O7WVYX6IFctPKEYTebVSLukKsgkSwmlTQS7palhFg==';
+        var precision = 30;
+        var defaultAccount = 'thagki9';
 
         var profileUrlTextBox = $('#5e-profile-url');
         var button = $('#estimate-button');
-        var buttonText = $('#estimate-button-text');
-        var spinner = $('#estimate-loading');
-        var precisionSelector = $('#precision-input');
         var resultBox = $('#result-box');
-        var precisionLabel = $('#precision');
 
         var storageKeyPlayerList = 'player-list';
         var storageKeyPlayerProfile = 'player:';
-        var storageKeyPrecision = 'precision';
 
         function startEstimatingStatus() {
             profileUrlTextBox.attr('disabled', true);
             $(`.estimate-button`).attr('disabled', true);
-            precisionSelector.attr('disabled', true);
-            buttonText.text('估算中...');
-            $(`.estimate-loading`).removeAttr('hidden');
         }
 
         function endEstimatingStatus() {
             profileUrlTextBox.removeAttr('disabled');
             $(`.estimate-button`).attr('disabled', false);
-            buttonText.text('估算');
-            $(`.estimate-loading`).attr('hidden', true);
-            precisionSelector.removeAttr('disabled');
         }
 
-        precisionSelector.on('change', function (e) {
-            precisionLabel.text(e.target.value);
-        })
-
         button.on('click', function () {
-            estimate();
+            $(`#estimate-loading`).removeAttr('hidden');
+            estimate()
+                .finally(function () {
+                    $(`#estimate-loading`).attr('hidden', true);
+                });
             return false;
         });
 
@@ -117,7 +98,7 @@
                 .then((function (resp) {
                     var data = resp.data;
                     if (data.success) {
-                        $('#stat-text').text(`今日已帮助 ${data.data.today_unique_user} 名未定级玩家完成 ${data.data.today_usage} 次分数估算`)
+                        $('#stat-text').text(`今日已帮助 ${data.data.today_unique_user} 名玩家完成 ${data.data.today_usage} 次分数估算`)
                     }
                 }))
                 .catch(function () { });
@@ -129,15 +110,12 @@
             if (!userId) {
                 var profileUrl = (profileUrlTextBox.val() || '').trim();
                 if (profileUrl === '') {
-                    endEstimatingStatus();
-                    return new Promise(function (res) { res(); });
+                    userId = defaultAccount;
+                } else {
+                    userId = profileUrl;
                 }
-                userId = profileUrl;
             }
             userId = userId.toLowerCase();
-
-            precision = precisionSelector.val();
-            updateLastPrecision(precision);
 
             return axios.get(apiInferElo + `&id=${userId}&precision=${precision}&t=${+new Date()}`)
                 .then((function (resp) {
@@ -183,23 +161,17 @@
             }
 
             var santizedId = filterXSS(player.user_id);
-
-            $(`#player-${santizedId}-estimate-button-text`).text('重新估算中...');
+            var spinner = $(`#player-${santizedId}-estimate-button-spinner`);
+            spinner.attr('hidden', false);
 
             estimate(userId).finally(function () {
-                $(`#player-${santizedId}-estimate-button-text`).text('重新估算');
+                spinner.attr('hidden', true);
             })
         }
 
 
         function init(playerProfile) {
             updateStat();
-
-            var precision = getLastPrecision();
-            if (precision > 0) {
-                precisionSelector.val(precision);
-                precisionLabel.text(precision);
-            }
 
             var list = getHistoryPlayerList();
             list.forEach(function (p) {
@@ -229,14 +201,6 @@
             location.reload();
         }
 
-        function updateLastPrecision(precision) {
-            window.localStorage.setItem(storageKeyPrecision, precision);
-        }
-
-        function getLastPrecision() {
-            return parseInt(window.localStorage.getItem(storageKeyPrecision) || '0');
-        }
-
         function renderProfile(player) {
             var santizedId = player.user_id;
             resultBox.html(''
@@ -249,8 +213,8 @@
                 + `        </div>`
                 + `    </div>`
                 + `    <button class="btn btn-primary estimate-button" type="button" id="player-${santizedId}-estimate-button" onclick="javascript:reEstimate('${player.user_id}')">`
-                + `        <span class="spinner-border spinner-border-sm estimate-loading" role="status" hidden></span>`
-                + `        <span id="player-${santizedId}-estimate-button-text">重新估算</span>`
+                + `        <span id="player-${santizedId}-estimate-button-spinner" class="spinner-border spinner-border-sm estimate-loading" role="status" hidden></span>`
+                + `        <span>重新估算</span>`
                 + `    </button>`
                 + `</div>` + resultBox.html());
         }
