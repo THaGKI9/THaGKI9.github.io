@@ -93,16 +93,16 @@
             return false;
         });
 
-        // function updateStat() {
-        //     return axios.get(apiStat + `&t=${+new Date()}`)
-        //         .then((function (resp) {
-        //             var data = resp.data;
-        //             if (data.success) {
-        //                 $('#stat-text').text(`今日已帮助 ${data.data.today_unique_user} 名玩家完成 ${data.data.today_usage} 次分数估算`)
-        //             }
-        //         }))
-        //         .catch(function () { });
-        // }
+        function updateStat() {
+            // return axios.get(apiStat + `&t=${+new Date()}`)
+            //     .then((function (resp) {
+            //         var data = resp.data;
+            //         if (data.success) {
+            //             $('#stat-text').text(`今日已帮助 ${data.data.today_unique_user} 名玩家完成 ${data.data.today_usage} 次分数估算`)
+            //         }
+            //     }))
+            //     .catch(function () { });
+        }
 
         function estimate(userId) {
             startEstimatingStatus();
