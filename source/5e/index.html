@@ -62,7 +62,7 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
-        var apiInferElo = 'https://5e-elo-estimator.azurewebsites.net/api/infer-elo?code=8c6DNkSiMnfJ1O7WVYX6IFctPKEYTebVSLukKsgkSwmlTQS7palhFg==';
+        var apiInferElo = 'https://1217741033825494.cn-shenzhen.fc.aliyuncs.com/2016-08-15/proxy/FiveEEloLookup/InferElo/';
         var apiStat = 'https://5e-elo-estimator.azurewebsites.net/api/stat?code=8c6DNkSiMnfJ1O7WVYX6IFctPKEYTebVSLukKsgkSwmlTQS7palhFg==';
         var precision = 30;
         var defaultAccount = 'thagki9';
@@ -93,16 +93,16 @@
             return false;
         });
 
-        function updateStat() {
-            return axios.get(apiStat + `&t=${+new Date()}`)
-                .then((function (resp) {
-                    var data = resp.data;
-                    if (data.success) {
-                        $('#stat-text').text(`今日已帮助 ${data.data.today_unique_user} 名玩家完成 ${data.data.today_usage} 次分数估算`)
-                    }
-                }))
-                .catch(function () { });
-        }
+        // function updateStat() {
+        //     return axios.get(apiStat + `&t=${+new Date()}`)
+        //         .then((function (resp) {
+        //             var data = resp.data;
+        //             if (data.success) {
+        //                 $('#stat-text').text(`今日已帮助 ${data.data.today_unique_user} 名玩家完成 ${data.data.today_usage} 次分数估算`)
+        //             }
+        //         }))
+        //         .catch(function () { });
+        // }
 
         function estimate(userId) {
             startEstimatingStatus();
